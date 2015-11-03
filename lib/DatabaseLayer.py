@@ -17,8 +17,10 @@ def getTokenDB(path):
   conn.execute('''CREATE TABLE IF NOT EXISTS HoneyTokens
                   (ID               INTEGER  PRIMARY KEY AUTOINCREMENT,
                    Token            TEXT     NOT NULL,
-                   Action           TEXT     Not NULL,
-                   CaseInsensitive  INTEGER  NOT NULL);''')
+                   Action           TEXT     NOT NULL,
+                   Alert            INTEGER  NOT NULL,
+                   CaseInsensitive  INTEGER  NOT NULL,
+                   isBinary         INTEGER  NOT NULL);''')
   conn.commit()
   return conn
 
@@ -30,9 +32,9 @@ def addTokens(path, tokens):
   tkns=selectAllFrom(path, "HoneyTokens")
   added=0
   for t in tokens:
-    if not any(d['token']==t['token']  for d in tkns):
-      conn.execute('''INSERT INTO HoneyTokens(Token, Action, CaseInsensitive) VALUES(:token,:action,:ci)''',
-                      {'token':t['token'], 'action': t['action'], 'ci': t['caseinsensitive']})
+    if not any(d['token']==t.token  for d in tkns):
+      conn.execute('''INSERT INTO HoneyTokens(Token, Action, Alert, CaseInsensitive, isBinary) VALUES(:tkn,:act,:alert,:ci,:ib)''',
+                      {'tkn':t.token, 'act': t.action, 'alert': t.alert, 'ci': t.isCaseInsensitive, 'ib': t.isBinary})
       added+=1
   conn.commit()
   conn.close()
