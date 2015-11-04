@@ -7,9 +7,10 @@ import binascii
 import re
 from netfilterqueue import NetfilterQueue
 from DatabaseLayer import selectAllFrom
+from lib.Configuration import Configuration as conf
 
 HoneyTokens=[]
-db="NSS.lite"
+db=conf.getDB()
 
 def readData():
   try:

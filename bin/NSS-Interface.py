@@ -16,6 +16,7 @@ import argparse
 from lib.DatabaseLayer import addTokens, selectAllFrom
 from lib.Toolkit import is_hex
 from lib.Objects import HoneyToken
+from lib.Configuration import Configuration as conf
 
 if __name__=='__main__':
   description='''Management script'''
@@ -31,32 +32,26 @@ if __name__=='__main__':
   parser.add_argument('-N', action='store_true', help='Notify - Alert the user right away')
   args = parser.parse_args()
   
-  #Defaults
-  _DEFAULT_ACTION = "drop"
-  _DEFAULT_DB = "NSS.lite"
-  _ACCEPTED_ACTIONS=["accept", "drop", "block"]
-  _TABLES_TO_PRINT=["HoneyTokens"]
-  
-  db=args.d if args.d else _DEFAULT_DB
+  db=args.d if args.d else conf.getDB()
   
   if args.L:
-    for x in _TABLES_TO_PRINT:
+    for x in conf.getTables():
       print("="*80 + "\n%s\n"%(x) + "="*80)
       for y in selectAllFrom(db, x):
         sys.stdout.write("|  ")
         for z in sorted(y.keys()):
           sys.stdout.write("%s: %s  |  "%(z, y[z]))
-        print()
+        print("")
   elif args.A:
     if args.t:
       # if args.B (Binary), get the clean hex version
       token=args.t if not args.B else is_hex(args.t)
-      action=args.a.lower() if args.a else _DEFAULT_ACTION
+      action=args.a.lower() if args.a else conf.getDefaultAction()
       alert=True if args.N else False
       CI=True if args.I else False
       IB=True if args.B else False
       # check if everything is allright
-      if action not in _ACCEPTED_ACTIONS: sys.exit("Unknown action: %s"%args.a.lower())
+      if action not in conf.getActions(): sys.exit("Unknown action: %s"%args.a.lower())
       if args.B and not token:            sys.exit("Invalid hex!")
       HoneyToken(token, action, alert, CI, IB)
       addTokens(db, HoneyToken(token, action, alert, CI, IB))

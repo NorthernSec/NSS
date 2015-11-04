@@ -12,6 +12,10 @@ import platform
 import sqlite3
 
 # Functions
+def verifyAllTables(path):
+  for x in [getTokenDB]:
+    x(path)
+
 def getTokenDB(path):
   conn=sqlite3.connect(path)
   conn.execute('''CREATE TABLE IF NOT EXISTS HoneyTokens
@@ -42,6 +46,7 @@ def addTokens(path, tokens):
 
 
 def selectAllFrom(path, table, where=None):
+  verifyAllTables(path)
   conn=sqlite3.connect(path)
   curs=conn.cursor()
   wh="where "+" and ".join(where) if where else ""
